@@ -6,6 +6,9 @@ read.and.filter.ncfiles <- function(ncfiles,
                                    progressbar = FALSE){
 
 
+  df.data.all <- data.frame()
+  yr.init <- 0
+
   # Special case, single file
 
   if (length(ncfiles) == 1){
@@ -21,6 +24,9 @@ read.and.filter.ncfiles <- function(ncfiles,
       cdf <-  df.data %>% mutate(yr = yr + yr.init)
     }
 
+    df.data.all <- bind_rows(list(df.data.all,
+                                  cdf))
+
     return(df.data.all)
 
   }
@@ -29,8 +35,6 @@ read.and.filter.ncfiles <- function(ncfiles,
     pb = txtProgressBar(min = 0, max = length(ncfiles), initial = 0)
   }
 
-  df.data.all <- data.frame()
-  yr.init <- 0
 
   for (ifile in seq(1,length(ncfiles))){
 

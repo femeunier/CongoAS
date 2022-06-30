@@ -4,6 +4,7 @@ library(epwshiftr)
 library(dplyr)
 library(CongoAS)
 library(RNetCDF)
+library(reshape2)
 
 models.with.vegetation <- init_cmip6_index(activity = "CMIP",
                                            variable = 'cVeg',
@@ -17,9 +18,8 @@ models.with.vegetation <- init_cmip6_index(activity = "CMIP",
                                            limit = 10000L,
                                            data_node = NULL)
 
-models <- unique(models.with.vegetation$source_id)
-
 files2download <- models.with.vegetation %>% filter(member_id == "r1i1p1f1")
+models <- unique(files2download$source_id)
 
 for (imodel in seq(1,length(models))){
 
@@ -31,6 +31,8 @@ for (imodel in seq(1,length(models))){
                                   continent2coord("Tropics")[[1]],
                                   var = "cVeg",
                                   aggr = TRUE)
+
+    stop()
   }
 }
 

@@ -3,6 +3,7 @@ rm(list = ls())
 library(epwshiftr)
 library(dplyr)
 library(CongoAS)
+library(RNetCDF)
 
 models.with.vegetation <- init_cmip6_index(activity = "CMIP",
                                            variable = 'cVeg',
@@ -25,13 +26,12 @@ for (imodel in seq(1,length(models))){
   cfiles <- files2download %>% filter(source_id == models[imodel])
   files.path <- file.path("/data/gent/vo/000/gvo00074/felicien/CMIP6/historical/cVeg",basename(cfiles$file_url))
 
-
-  stop()
-  read.and.filter.ncfiles(files.path,
-                          continent2coord("Tropics")[[1]],
-                          var = "cVeg",
-                          aggr = TRUE)
-
+  if (all(file.exists(files.path))){
+    df <- read.and.filter.ncfiles(files.path,
+                                  continent2coord("Tropics")[[1]],
+                                  var = "cVeg",
+                                  aggr = TRUE)
+  }
 }
 
 # scp /home/femeunier/Documents/projects/CongoAS/scripts/extract.CMIP6.files.R hpc:/kyukon/data/gent/vo/000/gvo00074/felicien/R

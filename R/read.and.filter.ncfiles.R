@@ -6,12 +6,32 @@ read.and.filter.ncfiles <- function(ncfiles,
                                    progressbar = FALSE){
 
 
+  # Special case, single file
+
+  if (length(ncfiles) == 1){
+    df.data <- read.and.filter.ncfile(ncfile = ncfiles,
+                                      coord.analysis = coord.analysis[[1]],
+                                      var,
+                                      aggr)
+
+    if (!is.null(mask.ocean)){
+      df.data.mask <- mask(df.data,mask.ocean)
+      cdf <-  df.data.mask %>% mutate(yr = yr + yr.init)
+    } else {
+      cdf <-  df.data %>% mutate(yr = yr + yr.init)
+    }
+
+    return(df.data.all)
+
+  }
+
   if (progressbar){
     pb = txtProgressBar(min = 0, max = length(ncfiles), initial = 0)
   }
 
   df.data.all <- data.frame()
   yr.init <- 0
+
   for (ifile in seq(1,length(ncfiles))){
 
     if (progressbar){setTxtProgressBar(pb,ifile)}

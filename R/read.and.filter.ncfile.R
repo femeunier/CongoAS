@@ -8,11 +8,11 @@ read.and.filter.ncfile <- function(ncfile,
   times <- var.get.nc(nc,"time")
 
   lats <- var.get.nc(nc,"lat")
-  lats.pos <- (lats >= coord.analysis[3]) & (lats <= coord.analysis[4])
+  lats.pos <- (lats >= coord.analysis[[1]][3]) & (lats <= coord.analysis[[1]][4])
 
   lons <- var.get.nc(nc,"lon")
   lons[lons > 180] <- lons[lons > 180] - 360
-  lons.pos <- (lons >= coord.analysis[1]) & (lons <= coord.analysis[2])
+  lons.pos <- (lons >= coord.analysis[[1]][1]) & (lons <= coord.analysis[[1]][2])
 
   cVar <- var.get.nc(nc,var)
 
@@ -43,7 +43,7 @@ read.and.filter.ncfile <- function(ncfile,
     filter(lon  >= coord.analysis[1], lon <= coord.analysis[2],
            lat >= coord.analysis[3], lat <= coord.analysis[4]) %>%
     mutate(time0 = time - min(time),
-           yr = floor(time0/ 365)) %>%
+           yr = floor(time0/365)) %>%
     group_by(lat, lon, yr)
 
   if (aggr){

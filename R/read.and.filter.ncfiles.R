@@ -13,7 +13,7 @@ read.and.filter.ncfiles <- function(ncfiles,
 
   if (length(ncfiles) == 1){
     df.data <- read.and.filter.ncfile(ncfile = ncfiles,
-                                      coord.analysis = coord.analysis[[1]],
+                                      coord.analysis = coord.analysis,
                                       var,
                                       aggr)
 
@@ -41,7 +41,7 @@ read.and.filter.ncfiles <- function(ncfiles,
     if (progressbar){setTxtProgressBar(pb,ifile)}
 
     df.data <- read.and.filter.ncfile(ncfile = ncfiles[ifile],
-                                      coord.analysis = coord.analysis[[1]],
+                                      coord.analysis = coord.analysis,
                                       var,
                                       aggr)
 

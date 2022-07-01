@@ -65,10 +65,10 @@ models.with.vegetation <- init_cmip6_index(activity = "CMIP",
                                           limit = 10000L,
                                           data_node = NULL)
 
-models <- unique(models.with.vegetation$source_id)
-
 files2download <- models.with.vegetation %>% filter(member_id == "r1i1p1f1",
                                                     data_node %in% (data.nodes.status %>% filter(status == "UP") %>% pull(data_node)))
+
+models <- unique(files2download$source_id)
 
 print("--- Downloading cVeg files")
 

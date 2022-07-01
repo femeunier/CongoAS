@@ -3,6 +3,7 @@ read.and.filter.ncfiles <- function(ncfiles,
                                    var = "cVeg",
                                    aggr = TRUE,
                                    mask.ocean = NULL,
+                                   start.year = NULL,
                                    progressbar = FALSE){
 
 
@@ -19,9 +20,13 @@ read.and.filter.ncfiles <- function(ncfiles,
 
     if (!is.null(mask.ocean)){
       df.data.mask <- mask(df.data,mask.ocean)
-      cdf <-  df.data.mask %>% mutate(yr = yr + yr.init)
+      cdf <-  df.data.mask
     } else {
       cdf <-  df.data %>% mutate(yr = yr + yr.init)
+    }
+
+    if (!is.null(start.year)){
+      cdf <- cdf %>% mutate(yr = yr + start.year)
     }
 
     df.data.all <- bind_rows(list(df.data.all,
@@ -47,11 +52,15 @@ read.and.filter.ncfiles <- function(ncfiles,
 
     if (!is.null(mask.ocean)){
       df.data.mask <- mask(df.data,mask.ocean)
-      cdf <-  df.data.mask %>% mutate(yr = yr + yr.init)
+      cdf <-  df.data.mask
     } else {
-      cdf <-  df.data %>% mutate(yr = yr + yr.init)
-
+      cdf <-  df.data
     }
+
+    if (!is.null(start.year)){
+      cdf <- cdf %>% mutate(yr = yr + start.year[ifile])
+    }
+
 
     df.data.all <- bind_rows(list(df.data.all,
                                   cdf))

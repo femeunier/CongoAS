@@ -33,13 +33,23 @@ for (imodel in seq(1,length(models))){
 
 
   cfiles <- files2download %>% filter(source_id == models[imodel])
+
+  if (sum(year(cfiles[["datetime_start"]]) == 1850) > 1){
+    cfiles <- cfiles[1:(which(year(cfiles[["datetime_start"]]) == 1850)[2] -1),]
+  }
+
+  if (!any(year(cfiles[["datetime_start"]]) == 1850)){
+    next()
+  }
+
   files.path <- file.path("/data/gent/vo/000/gvo00074/felicien/CMIP6/historical/cVeg",basename(cfiles$file_url))
 
   if (all(file.exists(files.path))){
     df <- read.and.filter.ncfiles(files.path,
                                   coord.analysis = continent2coord("Tropics"),
                                   var = "cVeg",
-                                  aggr = TRUE)
+                                  aggr = TRUE,
+                                  start.year = year(cfiles[["datetime_start"]]))
 
     if (max(df$yr) > 200) stop()
 

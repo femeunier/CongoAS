@@ -6,6 +6,23 @@ read.and.filter.ncfile <- function(ncfile,
 
   nc <- open.nc(ncfile)
   times <- var.get.nc(nc,"time")
+  tunits <- att.get.nc(nc, 'time','units')
+  tmp.date <- str_split(tunits," ")[[1]]
+  origin <- as.Date(paste(tmp.date[3],tmp.date[4]))
+
+  if (tmp.date[1] == "seconds"){
+    fac = 365*86400
+    fac2 = 1
+  } else if (tmp.date[1] == "days"){
+    fac = 365
+    fac2 = 86400
+  } else{
+    print(tmp.date)
+    error()
+  }
+
+
+  yr.origin <- year(as.POSIXct(times*fac2,origin = origin))
 
   lats <- var.get.nc(nc,"lat")
   lats.pos <- (lats >= coord.analysis[[1]][3]) & (lats <= coord.analysis[[1]][4])
@@ -43,7 +60,7 @@ read.and.filter.ncfile <- function(ncfile,
     filter(lon  >= coord.analysis[1], lon <= coord.analysis[2],
            lat >= coord.analysis[3], lat <= coord.analysis[4]) %>%
     mutate(time0 = time - min(time),
-           yr = floor(time0/365)) %>%
+           yr = floor(time0/fac)) %>%
     group_by(lat, lon, yr)
 
   if (aggr){
@@ -51,6 +68,7 @@ read.and.filter.ncfile <- function(ncfile,
                            .groups = "keep")
   }
   return(df %>% ungroup() %>%
-           rename(!!var := "cVar")
+           rename(!!var := "cVar") %>%
+           mutate(yr.origin = yr.origin)
   )
 }

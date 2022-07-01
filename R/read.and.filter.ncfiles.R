@@ -61,5 +61,5 @@ read.and.filter.ncfiles <- function(ncfiles,
 
   if (progressbar){close(pb)}
 
-  return(df.data.all)
+  return(df.data.all %>% ungroup() %>% mutate(yr.origin = min(yr.origin)))
 }

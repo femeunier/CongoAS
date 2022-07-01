@@ -5,6 +5,8 @@ library(dplyr)
 library(CongoAS)
 library(RNetCDF)
 library(reshape2)
+library(stringr)
+library(lubridate)
 
 models.with.vegetation <- init_cmip6_index(activity = "CMIP",
                                            variable = 'cVeg',

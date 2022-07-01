@@ -57,8 +57,8 @@ read.and.filter.ncfile <- function(ncfile,
     dplyr::select(lat,lon,time,cVar) %>%
     mutate(lon = case_when(lon > 180 ~ (lon -360),
                            TRUE ~ lon)) %>%
-    filter(lon  >= coord.analysis[1], lon <= coord.analysis[2],
-           lat >= coord.analysis[3], lat <= coord.analysis[4]) %>%
+    filter(lon  >= coord.analysis[[1]][1], lon <= coord.analysis[[1]][2],
+           lat >= coord.analysis[[1]][3], lat <= coord.analysis[[1]][4]) %>%
     mutate(time0 = time - min(time),
            yr = floor(time0/fac)) %>%
     group_by(lat, lon, yr)

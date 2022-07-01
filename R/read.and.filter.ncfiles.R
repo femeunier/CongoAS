@@ -56,7 +56,7 @@ read.and.filter.ncfiles <- function(ncfiles,
     df.data.all <- bind_rows(list(df.data.all,
                                   cdf))
 
-    yr.init <- yr.init + (max(cdf$yr) + 1)
+    yr.init <- (max(cdf$yr) + 1)
   }
 
   if (progressbar){close(pb)}

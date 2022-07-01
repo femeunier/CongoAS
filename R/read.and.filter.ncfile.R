@@ -22,7 +22,7 @@ read.and.filter.ncfile <- function(ncfile,
   }
 
 
-  yr.origin <- year(as.POSIXct(times*fac2,origin = origin))
+  yr.origin <- year(as.POSIXct(times[1]*fac2,origin = origin))
 
   lats <- var.get.nc(nc,"lat")
   lats.pos <- (lats >= coord.analysis[[1]][3]) & (lats <= coord.analysis[[1]][4])

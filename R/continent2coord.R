@@ -12,15 +12,15 @@ continent2coord <- function(continent){
     max.lat.plot <- max.lat.analysis
 
   } else if (continent == "Africa"){
-    min.lon.analysis <- -20
-    max.lon.analysis <- 55
-    min.lat.analysis <- -40
-    max.lat.analysis <- 40
+    min.lon.analysis <- -10
+    max.lon.analysis <- 45
+    min.lat.analysis <- -15
+    max.lat.analysis <- 10
 
-    min.lon.plot <- 0
-    max.lon.plot <- 50
+    min.lon.plot <- -10
+    max.lon.plot <- 45
     min.lat.plot <- -15
-    max.lat.plot <- 15
+    max.lat.plot <- 10
 
   } else if (continent == "Equator"){
     min.lon.analysis <- -90

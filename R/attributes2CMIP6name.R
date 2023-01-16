@@ -24,7 +24,7 @@ attributes2CMIP6name <- function(cdf = data.frame(var="cVeg",
   for (i in (1:length(var))){
     CMIP6name[i] <- paste0(paste(var[i],timestep[i],model[i],
                               scenario[i],variant[i],grid[i],
-                              paste0(as.character(init.year[i]),sprintf("%02d",init.month[i]),"-",s.character(end.year[i]),sprintf("%02d",end.month[i])),
+                              paste0(as.character(init.year[i]),sprintf("%02d",init.month[i]),"-",as.character(end.year[i]),sprintf("%02d",end.month[i])),
                               sep = "_"),".nc")
   }
 

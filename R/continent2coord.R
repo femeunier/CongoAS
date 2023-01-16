@@ -32,6 +32,7 @@ continent2coord <- function(continent){
     max.lon.plot <- max.lon.analysis
     min.lat.plot <- min.lat.analysis
     max.lat.plot <- max.lat.analysis
+
   } else if (continent == "Tropics"){
     min.lon.analysis <- -90
     max.lon.analysis <- 150

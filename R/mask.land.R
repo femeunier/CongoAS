@@ -2,11 +2,12 @@ mask.land <- function(lon,lat){
 
   data("wrld_simpl")
 
-  cdf <- data.frame(lon,lat) %>% mutate(ID = 1:length(lon))
+  cdf <- data.frame(lon,lat) %>%
+    arrange(lat,lon) %>% mutate(ID = 1:length(lon))
 
 
-  if (length(unique(diff(unique(lat)))) > 1){
-    res <- max(c(diff(unique(lat)),diff(unique(lon))))
+  if (length(unique(diff(sort(unique(lat))))) > 1){
+    res <- max(c(diff(sort(unique(lat))),diff(sort(unique(lon)))))
     temp <- raster(SpatialPixelsDataFrame(points = cdf[c("lon","lat")],
                                           data = cdf["ID"],
                                           tolerance = res/10))
@@ -20,7 +21,7 @@ mask.land <- function(lon,lat){
            lat = y) %>% mutate(is.land = 1)
 
   cdf.masked <- cdf %>%
-    left_join(masked,
+    left_join(masked %>% dplyr::select(-lon,-lat),
               by = c("ID")) %>%
     mutate(is.land = case_when(is.land == 1 ~ 1,
                                TRUE ~ 0))

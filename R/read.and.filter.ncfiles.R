@@ -1,10 +1,11 @@
 read.and.filter.ncfiles <- function(ncfiles,
-                                   coord.analysis,
-                                   var = "cVeg",
-                                   aggr = TRUE,
-                                   mask.ocean = NULL,
-                                   start.year = NULL,
-                                   progressbar = FALSE){
+                                    coord.analysis = continent2coord("World"),
+                                    var = "cVeg",
+                                    aggr = TRUE,
+                                    mask.ocean = NULL,
+                                    start.year = NULL,
+                                    progressbar = FALSE,
+                                    yr.rel = NULL){
 
 
   df.data.all <- data.frame()
@@ -16,7 +17,8 @@ read.and.filter.ncfiles <- function(ncfiles,
     df.data <- read.and.filter.ncfile(ncfile = ncfiles,
                                       coord.analysis = coord.analysis,
                                       var,
-                                      aggr)
+                                      aggr,
+                                      yr.rel)
 
     if (!is.null(mask.ocean)){
       df.data.mask <- mask(df.data,mask.ocean)

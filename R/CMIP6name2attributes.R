@@ -6,7 +6,6 @@ CMIP6name2attributes <- function(CMIP6name){
   all.attributes <- strsplit(CMIP6name.noext,split = "_")
   attributes <- purrr::map_dfr(1:length(all.attributes),
                               function(i){
-                                print(i)
                                 data.frame(var = all.attributes[[i]][1],
                                            timestep = all.attributes[[i]][2],
                                            model = all.attributes[[i]][3],

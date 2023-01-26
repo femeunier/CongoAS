@@ -31,7 +31,7 @@ read.and.filter.ncfile <- function(ncfile,
   }
   yr.origin <- year(as.POSIXct(times[1]*fac2,origin = origin))
 
-  ncfilin <- open.nc(ncfile)
+  ncfilin <- nc_open(ncfile)
   dates <- nc.get.time.series(f = ncfilin,
                               time.dim.name = "time")
   nc_close(ncfilin)

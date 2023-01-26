@@ -30,7 +30,12 @@ read.and.filter.ncfile <- function(ncfile,
     error()
   }
   yr.origin <- year(as.POSIXct(times[1]*fac2,origin = origin))
-  dates <- as.Date(times,origin = origin)
+
+  ncfilin <- open.nc(ncfile)
+  dates <- nc.get.time.series(f = ncfilin,
+                              time.dim.name = "time")
+  nc_close(ncfilin)
+
 
   lats <- NULL ; i = 1
   while(is.null(lats) & i <= length(lat.names)){

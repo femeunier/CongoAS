@@ -16,8 +16,6 @@ read.and.filter.ncfile <- function(ncfile,
     print(paste0("- ",tunits))
   }
 
-
-
   tmp.date <- str_split(tunits," ")[[1]]
   origin <- as.Date(paste(tmp.date[3],tmp.date[4]))
 
@@ -32,6 +30,7 @@ read.and.filter.ncfile <- function(ncfile,
     error()
   }
   yr.origin <- year(as.POSIXct(times[1]*fac2,origin = origin))
+  dates <- as.Date(times[1]*fac2,origin = origin)
 
   lats <- NULL ; i = 1
   while(is.null(lats) & i <= length(lat.names)){
@@ -73,7 +72,8 @@ read.and.filter.ncfile <- function(ncfile,
   df <- melt(cVar) %>%
     mutate(lon = (lons[lons.pos])[Var1],
            lat = (lats[lats.pos])[Var2],
-           time = times[Var3],
+           time = dates[Var3],
+           # time = times[Var3],
            cVar = value) %>%
     dplyr::select(lat,lon,time,cVar) %>%
     mutate(lon = case_when(lon > 180 ~ (lon -360),
@@ -81,7 +81,9 @@ read.and.filter.ncfile <- function(ncfile,
     filter(lon  >= coord.analysis[[1]][1], lon <= coord.analysis[[1]][2],
            lat >= coord.analysis[[1]][3], lat <= coord.analysis[[1]][4]) %>%
     mutate(time0 = time - min(time),
-           yr = floor(time0/fac)) %>%
+           yr = year(time),
+           # yr = floor(time0/fac)
+           ) %>%
     group_by(lat, lon, yr)
 
   if (aggr){

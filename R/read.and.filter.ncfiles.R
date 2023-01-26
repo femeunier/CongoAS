@@ -74,7 +74,7 @@ read.and.filter.ncfiles <- function(ncfiles,
     }
 
     if (!is.null(start.year)){
-      cdf <- cdf %>% mutate(yr = yr + start.year[ifile])
+      cdf <- cdf %>% mutate(yr = yr + start.year)
     }
 
 

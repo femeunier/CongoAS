@@ -87,8 +87,8 @@ read.and.filter.ncfile <- function(ncfile,
            lat >= coord.analysis[[1]][3], lat <= coord.analysis[[1]][4]) %>%
     mutate(time0 = time - min(time),
            yr = year(time),
-           month = month(time),
-           day = day(time)
+           m = month(time),
+           d = day(time)
            # yr = floor(time0/fac)
            ) %>%
     dplyr::select(-time) %>%

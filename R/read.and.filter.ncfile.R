@@ -6,9 +6,9 @@ read.and.filter.ncfile <- function(ncfile,
                                    lat.names = c("latitude","lat","lat_FULL"),
                                    lon.names = c("longitude","lon","lon_FULL")){
 
-  nc <- open.nc(ncfile)
-  times <- var.get.nc(nc,"time")
-  tunits <- att.get.nc(nc, 'time','units')
+  nc <- nc_open(ncfile)
+  times <- ncvar_get(nc,"time")
+  tunits <- ncvar_get(nc, 'time','units')
   tmp.date <- str_split(tunits," ")[[1]]
   origin <- as.Date(paste(tmp.date[3],tmp.date[4]))
 
@@ -45,23 +45,23 @@ read.and.filter.ncfile <- function(ncfile,
   lons[lons > 180] <- lons[lons > 180] - 360
   lons.pos <- (lons >= coord.analysis[[1]][1]) & (lons <= coord.analysis[[1]][2])
 
-  cVar <- var.get.nc(nc,var)
+  cVar <- ncvar_get(nc,var)
 
   if (length(dim(cVar)) == 4){
     if (!is.null(yr.rel)){
-      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,yr.rel]
+      cVar <- ncvar_get(nc,var)[lons.pos,lats.pos,1,yr.rel]
     } else{
-      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,]
+      cVar <- ncvar_get(nc,var)[lons.pos,lats.pos,1,]
     }
   } else {
     if (!is.null(yr.rel)){
-      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,yr.rel]
+      cVar <- ncvar_get(nc,var)[lons.pos,lats.pos,yr.rel]
     } else{
-      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,]
+      cVar <- ncvar_get(nc,var)[lons.pos,lats.pos,]
     }
   }
 
-  close.nc(nc)
+  nc_close(nc)
 
   df <- melt(cVar) %>%
     mutate(lon = (lons[lons.pos])[Var1],

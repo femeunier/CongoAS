@@ -6,9 +6,9 @@ read.and.filter.ncfile <- function(ncfile,
                                    lat.names = c("latitude","lat","lat_FULL"),
                                    lon.names = c("longitude","lon","lon_FULL")){
 
-  nc <- nc_open(ncfile)
-  times <- ncvar_get(nc,"time")
-  tunits <- ncvar_get(nc, 'time','units')
+  nc <- open.nc(ncfile)
+  times <- var.get.nc(nc,"time")
+  tunits <- att.get.nc(nc, 'time','units')
   tmp.date <- str_split(tunits," ")[[1]]
   origin <- as.Date(paste(tmp.date[3],tmp.date[4]))
 
@@ -22,13 +22,11 @@ read.and.filter.ncfile <- function(ncfile,
     print(tmp.date)
     error()
   }
-
-
   yr.origin <- year(as.POSIXct(times[1]*fac2,origin = origin))
 
   lats <- NULL ; i = 1
   while(is.null(lats) & i <= length(lat.names)){
-    lats <- tryCatch(suppressMessages(ncvar_get(nc,lat.names[i])),
+    lats <- tryCatch(suppressMessages(var.get.nc(nc,lat.names[i])),
                      error = function(e) NULL)
     i = i +1
   }
@@ -38,30 +36,30 @@ read.and.filter.ncfile <- function(ncfile,
 
   lons <- NULL ; i = 1
   while(is.null(lons) & i <= length(lon.names)){
-    lons <- tryCatch(suppressMessages(ncvar_get(nc,lon.names[i])),
+    lons <- tryCatch(suppressMessages(var.get.nc(nc,lon.names[i])),
                      error = function(e) NULL)
     i = i +1
   }
   lons[lons > 180] <- lons[lons > 180] - 360
   lons.pos <- (lons >= coord.analysis[[1]][1]) & (lons <= coord.analysis[[1]][2])
 
-  cVar <- ncvar_get(nc,var)
+  cVar <- var.get.nc(nc,var)
 
   if (length(dim(cVar)) == 4){
     if (!is.null(yr.rel)){
-      cVar <- ncvar_get(nc,var)[lons.pos,lats.pos,1,yr.rel]
+      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,yr.rel]
     } else{
-      cVar <- ncvar_get(nc,var)[lons.pos,lats.pos,1,]
+      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,]
     }
   } else {
     if (!is.null(yr.rel)){
-      cVar <- ncvar_get(nc,var)[lons.pos,lats.pos,yr.rel]
+      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,yr.rel]
     } else{
-      cVar <- ncvar_get(nc,var)[lons.pos,lats.pos,]
+      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,]
     }
   }
 
-  nc_close(nc)
+  close.nc(nc)
 
   df <- melt(cVar) %>%
     mutate(lon = (lons[lons.pos])[Var1],

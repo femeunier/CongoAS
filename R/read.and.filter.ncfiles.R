@@ -7,7 +7,8 @@ read.and.filter.ncfiles <- function(ncfiles,
                                     progressbar = FALSE,
                                     yr.rel = NULL,
                                     lat.names = c("latitude","lat","lat_FULL"),
-                                    lon.names = c("longitude","lon","lon_FULL")){
+                                    lon.names = c("longitude","lon","lon_FULL"),
+                                    debug = FALSE){
 
 
   df.data.all <- data.frame()

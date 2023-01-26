@@ -4,11 +4,17 @@ read.and.filter.ncfile <- function(ncfile,
                                    aggr = TRUE,
                                    yr.rel = NULL,
                                    lat.names = c("latitude","lat","lat_FULL"),
-                                   lon.names = c("longitude","lon","lon_FULL")){
+                                   lon.names = c("longitude","lon","lon_FULL"),
+                                   debug = FALSE){
 
   nc <- open.nc(ncfile)
   times <- var.get.nc(nc,"time")
   tunits <- att.get.nc(nc, 'time','units')
+
+  print(ncfile)
+  print(paste0("- ",tunits))
+
+
   tmp.date <- str_split(tunits," ")[[1]]
   origin <- as.Date(paste(tmp.date[3],tmp.date[4]))
 

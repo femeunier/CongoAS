@@ -11,8 +11,11 @@ read.and.filter.ncfile <- function(ncfile,
   times <- var.get.nc(nc,"time")
   tunits <- att.get.nc(nc, 'time','units')
 
-  print(ncfile)
-  print(paste0("- ",tunits))
+  if (debug){
+    print(ncfile)
+    print(paste0("- ",tunits))
+  }
+
 
 
   tmp.date <- str_split(tunits," ")[[1]]

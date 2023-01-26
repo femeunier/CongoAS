@@ -21,7 +21,8 @@ read.and.filter.ncfiles <- function(ncfiles,
                                       coord.analysis = coord.analysis,
                                       var,
                                       aggr,
-                                      yr.rel)
+                                      yr.rel,
+                                      debug = debug)
 
     if (!is.null(mask.ocean)){
       df.data.mask <- mask(df.data,mask.ocean)
@@ -50,10 +51,21 @@ read.and.filter.ncfiles <- function(ncfiles,
 
     if (progressbar){setTxtProgressBar(pb,ifile)}
 
-    df.data <- read.and.filter.ncfile(ncfile = ncfiles[ifile],
-                                      coord.analysis = coord.analysis,
-                                      var,
-                                      aggr)
+
+    if (ifile %in% c(1,2)){
+      df.data <- read.and.filter.ncfile(ncfile = ncfiles[ifile],
+                                        coord.analysis = coord.analysis,
+                                        var,
+                                        aggr,
+                                        debug = debug)
+    } else {
+      df.data <- read.and.filter.ncfile(ncfile = ncfiles[ifile],
+                                        coord.analysis = coord.analysis,
+                                        var,
+                                        aggr,
+                                        debug = FALSE)
+    }
+
 
     if (!is.null(mask.ocean)){
       df.data.mask <- mask(df.data,mask.ocean)

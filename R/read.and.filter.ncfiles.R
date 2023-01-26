@@ -12,7 +12,6 @@ read.and.filter.ncfiles <- function(ncfiles,
 
 
   df.data.all <- data.frame()
-  yr.init <- 0
 
   # Special case, single file
 
@@ -28,7 +27,7 @@ read.and.filter.ncfiles <- function(ncfiles,
       df.data.mask <- mask(df.data,mask.ocean)
       cdf <-  df.data.mask
     } else {
-      cdf <-  df.data %>% mutate(yr = yr + yr.init)
+      cdf <-  df.data
     }
 
     if (!is.null(start.year)){
@@ -82,7 +81,6 @@ read.and.filter.ncfiles <- function(ncfiles,
     df.data.all <- bind_rows(list(df.data.all,
                                   cdf))
 
-    yr.init <- (max(cdf$yr) + 1)
   }
 
   if (progressbar){close(pb)}

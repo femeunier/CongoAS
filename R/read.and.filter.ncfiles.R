@@ -5,7 +5,9 @@ read.and.filter.ncfiles <- function(ncfiles,
                                     mask.ocean = NULL,
                                     start.year = NULL,
                                     progressbar = FALSE,
-                                    yr.rel = NULL){
+                                    yr.rel = NULL,
+                                    lat.names = c("latitude","lat","lat_FULL"),
+                                    lon.names = c("longitude","lon","lon_FULL")){
 
 
   df.data.all <- data.frame()

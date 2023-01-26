@@ -2,7 +2,9 @@ read.and.filter.ncfile <- function(ncfile,
                                    coord.analysis,
                                    var = "cVeg",
                                    aggr = TRUE,
-                                   yr.rel = NULL){
+                                   yr.rel = NULL,
+                                   lat.names = c("latitude","lat","lat_FULL"),
+                                   lon.names = c("longitude","lon","lon_FULL")){
 
   nc <- open.nc(ncfile)
   times <- var.get.nc(nc,"time")
@@ -24,10 +26,22 @@ read.and.filter.ncfile <- function(ncfile,
 
   yr.origin <- year(as.POSIXct(times[1]*fac2,origin = origin))
 
-  lats <- var.get.nc(nc,"lat")
+  lats <- NULL ; i = 1
+  while(is.null(lats) & i <= length(lat.names)){
+    lats <- tryCatch(suppressMessages(ncvar_get(nc,lat.names[i])),
+                     error = function(e) NULL)
+    i = i +1
+  }
+
   lats.pos <- (lats >= coord.analysis[[1]][3]) & (lats <= coord.analysis[[1]][4])
 
-  lons <- var.get.nc(nc,"lon")
+
+  lons <- NULL ; i = 1
+  while(is.null(lons) & i <= length(lon.names)){
+    lons <- tryCatch(suppressMessages(ncvar_get(nc,lon.names[i])),
+                     error = function(e) NULL)
+    i = i +1
+  }
   lons[lons > 180] <- lons[lons > 180] - 360
   lons.pos <- (lons >= coord.analysis[[1]][1]) & (lons <= coord.analysis[[1]][2])
 

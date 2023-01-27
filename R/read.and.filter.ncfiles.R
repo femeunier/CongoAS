@@ -4,8 +4,8 @@ read.and.filter.ncfiles <- function(ncfiles,
                                     aggr = TRUE,
                                     mask.ocean = NULL,
                                     start.year = NULL,
-                                    progressbar = FALSE,
                                     yr.rel = NULL,
+                                    progressbar = FALSE,
                                     lat.names = c("latitude","lat","lat_FULL"),
                                     lon.names = c("longitude","lon","lon_FULL"),
                                     debug = FALSE){
@@ -20,7 +20,6 @@ read.and.filter.ncfiles <- function(ncfiles,
                                       coord.analysis = coord.analysis,
                                       var,
                                       aggr,
-                                      yr.rel,
                                       debug = debug)
 
     if (!is.null(mask.ocean)){

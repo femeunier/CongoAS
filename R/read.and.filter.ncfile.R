@@ -29,7 +29,7 @@ read.and.filter.ncfile <- function(ncfile,
     print(tmp.date)
     error()
   }
-  yr.origin <- year(as.POSIXct(times[1]*fac2,origin = origin))
+  date.origin <- (as.POSIXct(times[1]*fac2,origin = origin))
 
   ncfilin <- nc_open(ncfile)
   dates <- nc.get.time.series(f = ncfilin,
@@ -60,7 +60,8 @@ read.and.filter.ncfile <- function(ncfile,
 
   if (length(dim(cVar)) == 4){
     if (!is.null(yr.rel)){
-      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,yr.rel]
+      year.pos = which(year(dates) %in% yr.rel)
+      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,year.pos]
     } else{
       cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,]
     }
@@ -86,9 +87,9 @@ read.and.filter.ncfile <- function(ncfile,
     filter(lon  >= coord.analysis[[1]][1], lon <= coord.analysis[[1]][2],
            lat >= coord.analysis[[1]][3], lat <= coord.analysis[[1]][4]) %>%
     mutate(time0 = time - min(time),
-           yr = year(time),
-           m = month(time),
-           d = day(time)
+           year = year(time),
+           month = month(time),
+           day = day(time)
            # yr = floor(time0/fac)
            ) %>%
     dplyr::select(-time) %>%
@@ -100,6 +101,6 @@ read.and.filter.ncfile <- function(ncfile,
   }
   return(df %>% ungroup() %>%
            rename(!!var := "cVar") %>%
-           mutate(yr.origin = yr.origin)
+           mutate(date.origin = date.origin)
   )
 }

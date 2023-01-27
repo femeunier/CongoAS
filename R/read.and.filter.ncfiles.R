@@ -11,6 +11,8 @@ read.and.filter.ncfiles <- function(ncfiles,
                                     debug = FALSE){
 
 
+
+
   df.data.all <- data.frame()
 
   # Special case, single file

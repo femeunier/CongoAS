@@ -42,8 +42,7 @@ read.and.filter.ncfile <- function(ncfile,
 
   ncfilin <- nc_open(ncfile)
   dates <- nc.get.time.series(f = ncfilin,
-                              time.dim.name = "time",
-                              correct.for.gregorian.julian = TRUE)
+                              time.dim.name = "time")
   nc_close(ncfilin)
 
 

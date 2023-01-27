@@ -93,7 +93,7 @@ read.and.filter.ncfile <- function(ncfile,
            # yr = floor(time0/fac)
            ) %>%
     dplyr::select(-time) %>%
-    group_by(lat, lon, yr)
+    group_by(lat, lon, year)
 
   if (aggr){
     df <- df %>% summarise(cVar = mean(cVar),

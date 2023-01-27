@@ -7,6 +7,15 @@ read.and.filter.ncfile <- function(ncfile,
                                    lon.names = c("longitude","lon","lon_FULL"),
                                    debug = FALSE){
 
+
+  # ncfile <- "/data/gent/vo/000/gvo00074/felicien/CMIP6/historical/pr/pr_Amon_IITM-ESM_historical_r1i1p1f1_gn_185001-185912.nc"
+  # coord.analysis = continent2coord("Africa")
+  # var = "pr"
+  # aggr = FALSE
+  # lat.names = c("latitude","lat","lat_FULL")
+  # lon.names = c("longitude","lon","lon_FULL")
+  # debug = FALSE
+
   nc <- open.nc(ncfile)
   times <- var.get.nc(nc,"time")
   tunits <- att.get.nc(nc, 'time','units')
@@ -33,7 +42,8 @@ read.and.filter.ncfile <- function(ncfile,
 
   ncfilin <- nc_open(ncfile)
   dates <- nc.get.time.series(f = ncfilin,
-                              time.dim.name = "time")
+                              time.dim.name = "time",
+                              correct.for.gregorian.julian = TRUE)
   nc_close(ncfilin)
 
 
@@ -82,7 +92,7 @@ read.and.filter.ncfile <- function(ncfile,
            # time = times[Var3],
            cVar = value) %>%
     dplyr::select(lat,lon,time,cVar) %>%
-    mutate(lon = case_when(lon > 180 ~ (lon -360),
+    mutate(lon = case_when(lon > 180 ~ (lon - 360),
                            TRUE ~ lon)) %>%
     filter(lon  >= coord.analysis[[1]][1], lon <= coord.analysis[[1]][2],
            lat >= coord.analysis[[1]][3], lat <= coord.analysis[[1]][4]) %>%

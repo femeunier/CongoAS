@@ -2,7 +2,7 @@ read.and.filter.ncfile <- function(ncfile,
                                    coord.analysis,
                                    var = "cVeg",
                                    aggr = TRUE,
-                                   yr.rel = NULL,
+                                   years = NULL,
                                    lat.names = c("latitude","lat","lat_FULL"),
                                    lon.names = c("longitude","lon","lon_FULL"),
                                    debug = FALSE){
@@ -68,15 +68,16 @@ read.and.filter.ncfile <- function(ncfile,
   cVar <- var.get.nc(nc,var)
 
   if (length(dim(cVar)) == 4){
-    if (!is.null(yr.rel)){
-      year.pos = which(year(dates) %in% yr.rel)
+    if (!is.null(years)){
+      year.pos = which(year(dates) %in% years)
       cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,year.pos]
     } else{
       cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,1,]
     }
   } else {
-    if (!is.null(yr.rel)){
-      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,yr.rel]
+    if (!is.null(years)){
+      year.pos = which(year(dates) %in% years)
+      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,years]
     } else{
       cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,]
     }

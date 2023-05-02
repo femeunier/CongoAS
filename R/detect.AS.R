@@ -120,6 +120,9 @@ detect.AS <- function(location = "Tropics",
 
   return(list(cVeg.change = df.data.all.change,
               TS.AS = basin.AS,
-              criteria = df2plot.criteria))
+              criteria = df2plot.criteria,
+              df.grid = df.control %>%
+                group_by(lon,lat) %>%
+                slice_head(n = 1)))
 
 }

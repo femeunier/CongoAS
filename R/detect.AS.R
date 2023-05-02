@@ -11,11 +11,15 @@ detect.AS <- function(location = "Tropics",
   df.control <- read.and.filter.ncfiles(ncfiles.cfiles,
                                         coord.analysis = coord.list,
                                         var = "cVeg",
-                                        aggr = TRUE)
+                                        aggr = TRUE) %>%
+    ungroup() %>%
+    filter(year > (max(year) - 150))
 
   mask.ocean <- df.control %>% group_by(lat,lon) %>%
     summarise(is.land = !all(cVeg == 0),
-              .groups = "keep")
+              .groups = "keep") %>%
+    mutate(is.land = case_when(is.land == TRUE ~ TRUE,
+                               TRUE ~ FALSE))
 
   df.control.mask <- CongoAS::mask(df.control,mask.ocean) %>%
     group_by(lat, lon) %>%

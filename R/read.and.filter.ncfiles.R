@@ -33,7 +33,7 @@ read.and.filter.ncfiles <- function(ncfiles,
     }
 
     if (!is.null(start.year)){
-      cdf <- cdf %>% mutate(yr = yr + start.year)
+      cdf <- cdf %>% mutate(year = year + start.year)
     }
 
     df.data.all <- bind_rows(list(df.data.all,
@@ -69,14 +69,14 @@ read.and.filter.ncfiles <- function(ncfiles,
 
 
     if (!is.null(mask.ocean)){
-      df.data.mask <- mask(df.data,mask.ocean)
+      df.data.mask <- CongoAS::mask(df.data,mask.ocean)
       cdf <-  df.data.mask
     } else {
       cdf <-  df.data
     }
 
     if (!is.null(start.year)){
-      cdf <- cdf %>% mutate(yr = yr + start.year)
+      cdf <- cdf %>% mutate(year = year + start.year)
     }
 
 

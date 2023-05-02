@@ -110,7 +110,6 @@ read.and.filter.ncfile <- function(ncfile,
                            .groups = "keep")
   }
   return(df %>% ungroup() %>%
-           rename(!!var := "cVar") %>%
-           mutate(date.origin = date.origin)
-  )
+           rename(!!var := "cVar"))
+         # %>% mutate(date.origin = date.origin)
 }

@@ -1,6 +1,6 @@
 detect.AS <- function(location = "Tropics",
                       ncfiles =  "/home/femeunier/Downloads/cVeg_Lmon_TaiESM1_1pctCO2_r1i1p1f1_gn_000102-015012.nc",
-                      ncfiles.cfile = "/home/femeunier/Downloads/cVeg_Lmon_TaiESM1_piControl_r1i1p1f1_gn_060101-070012.nc",
+                      ncfiles.cfiles = "/home/femeunier/Downloads/cVeg_Lmon_TaiESM1_piControl_r1i1p1f1_gn_060101-070012.nc",
                       dt = 1){
 
   coord.list <- continent2coord(location)
@@ -8,30 +8,30 @@ detect.AS <- function(location = "Tropics",
   #######################################################################################################################
   # Control file(s)
 
-  df.control <- read.and.filter.ncfile(ncfiles.cfile,
-                                       coord.list[[1]],
-                                       var = "cVeg",
-                                       aggr = TRUE)
+  df.control <- read.and.filter.ncfiles(ncfiles.cfiles,
+                                        coord.analysis = coord.list,
+                                        var = "cVeg",
+                                        aggr = TRUE)
 
   mask.ocean <- df.control %>% group_by(lat,lon) %>%
     summarise(is.land = !all(cVeg == 0),
               .groups = "keep")
 
-  df.control.mask <- mask(df.control,mask.ocean) %>%
+  df.control.mask <- CongoAS::mask(df.control,mask.ocean) %>%
     group_by(lat, lon) %>%
     mutate(ID = cur_group_id())
 
   df.control.var <-
     df.control.mask %>%
     group_by(ID,lat,lon) %>%
-    mutate(diff.cVeg = c(NA,diff(cVeg))) %>%
+    mutate(diff.cVeg = compute.diff.cVeg(cVeg,dt,Nyears = 1)) %>%
     summarise(var.cVeg = var(abs(diff.cVeg),na.rm = TRUE),
               .groups = "keep")
 
   ###########################################################################################################
 
   df.data.all <- read.and.filter.ncfiles(ncfiles,
-                                         coord.list,
+                                         coord.analysis = coord.list,
                                          var = "cVeg",
                                          aggr = TRUE,
                                          mask.ocean,
@@ -42,18 +42,27 @@ detect.AS <- function(location = "Tropics",
     left_join(df.control.var,
               by = c("lat","lon")) %>%
     group_by(lat, lon) %>%
-    mutate(diff.cVeg = compute.diff.cVeg(cVeg,dt),
+    mutate(diff.cVeg = compute.diff.cVeg(cVeg,dt,Nyears = 15),
            overall.change = compute.overall.change(cVeg,dt)) %>%
     mutate(change.rate.m = compute.change.rate(diff.cVeg,dt)) %>%
     mutate(criteria1 = abs(diff.cVeg) >= 2) %>%
     mutate(criteria2 = abs(diff.cVeg) >= (0.25*abs(overall.change)),
            criteria3 = change.rate.m >= 3*sqrt(var.cVeg)) %>%
     mutate(all.crit = criteria1 & criteria2 & criteria3) %>%
-    # mutate(all.crit = shift.beg.AS(all.crit,yr,N = 15)) %>%
     mutate(Trend = case_when(overall.change > 0 ~ "+",
                              TRUE ~ "-"))
 
 
+  # temp <- df.AS %>%
+  #   group_by(lat,lon) %>%
+  #   filter(cVeg[length(cVeg)] < (cVeg[1] - 20)) %>%
+  #   filter(lat == lat[1],lon == lon[1])
+  #
+  # ggplot(data = df.AS %>%
+  #          group_by(lat,lon) %>%
+  #          filter(cVeg[length(cVeg)] < (cVeg[1] - 20))) +
+  #   geom_line(aes(x = year,y = cVeg, group = interaction(lat,lon))) +
+  #   theme_bw()
 
   #################################################################################################
 
@@ -63,7 +72,7 @@ detect.AS <- function(location = "Tropics",
            .groups = "keep")
 
   df2plot.criteria <-
-    basin.AS %>% dplyr::select(ID,lat,lon,yr,
+    basin.AS %>% dplyr::select(ID,lat,lon,year,
                                criteria1,
                                criteria2,
                                criteria3,
@@ -91,12 +100,12 @@ detect.AS <- function(location = "Tropics",
 
   df.data.all.change <-
     bind_rows(list(
-      df.data.all %>% filter(yr %in% c(min(yr), max(yr))) %>%
-        mutate(timing = case_when(yr == 0 ~ "Init",
+      df.data.all %>% filter(year %in% c(min(year), max(year))) %>%
+        mutate(timing = case_when(year == 0 ~ "Init",
                                   TRUE ~ "Final")),
       df.change %>%
-        filter(yr == max(yr)) %>%
-        dplyr::select(lat,lon,yr,cVeg.change) %>%
+        filter(year == max(year)) %>%
+        dplyr::select(lat,lon,year,cVeg.change) %>%
         rename(cVeg = cVeg.change) %>%
         mutate(timing = "Change")
     )) %>% mutate(timing = factor(timing,levels = c("Init","Final","Change")))

@@ -118,17 +118,13 @@ detect.AS <- function(location = "Tropics",
     group_by(lat,lon) %>%
     summarise()
 
-  grid <- read.and.filter.ncfile(ncfiles.cfiles[1],
-                                 coord.analysis = coord.list,
-                                 var = "cVeg",
-                                 aggr = TRUE,
-                                 years = min(df.control[["year"]]))
+  grid <- read.grid(ncfiles.cfiles[1],
+                    coord.analysis = continent2coord("World"),
+                    var = "cVeg")
 
   return(list(cVeg.change = df.data.all.change,
               TS.AS = basin.AS,
               criteria = df2plot.criteria,
-              df.grid = grid %>%
-                group_by(lon,lat) %>%
-                slice_head(n = 1)))
+              df.grid = grid))
 
 }

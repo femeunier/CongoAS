@@ -42,7 +42,7 @@ read.grid <- function(ncfile,
     mutate(lon = (lons[lons.pos])[Var1],
            lat = (lats[lats.pos])[Var2],
            cVar = value) %>%
-    dplyr::select(lat,lon,time,cVar) %>%
+    dplyr::select(lat,lon,cVar) %>%
     mutate(lon = case_when(lon > 180 ~ (lon - 360),
                            TRUE ~ lon)) %>%
     filter(lon  >= coord.analysis[[1]][1], lon <= coord.analysis[[1]][2],

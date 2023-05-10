@@ -57,12 +57,14 @@ read.and.filter.ncfiles <- function(ncfiles,
       df.data <- read.and.filter.ncfile(ncfile = ncfiles[ifile],
                                         coord.analysis = coord.analysis,
                                         var,
+                                        years = years,
                                         aggr,
                                         debug = debug)
     } else {
       df.data <- read.and.filter.ncfile(ncfile = ncfiles[ifile],
                                         coord.analysis = coord.analysis,
                                         var,
+                                        years = years,
                                         aggr,
                                         debug = FALSE)
     }

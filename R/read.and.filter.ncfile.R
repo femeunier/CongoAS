@@ -77,7 +77,7 @@ read.and.filter.ncfile <- function(ncfile,
   } else {
     if (!is.null(years)){
       year.pos = which(year(dates) %in% years)
-      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,years]
+      cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,year.pos]
     } else{
       cVar <- var.get.nc(nc,var)[lons.pos,lats.pos,]
     }

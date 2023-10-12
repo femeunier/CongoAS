@@ -105,7 +105,7 @@ detect.AS <- function(location = "Tropics",
   df.data.all.change <-
     bind_rows(list(
       df.data.all %>% filter(year %in% c(min(year), max(year))) %>%
-        mutate(timing = case_when(year == 0 ~ "Init",
+        mutate(timing = case_when(year == min(year) ~ "Init",
                                   TRUE ~ "Final")),
       df.change %>%
         filter(year == max(year)) %>%

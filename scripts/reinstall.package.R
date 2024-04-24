@@ -1,7 +1,7 @@
 library(devtools)
 library(CongoAS)
 
-install_github("femeunier/CongoAS",auth_token ="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")
+install_github("femeunier/CongoAS")
 detach("package:CongoAS")
 
 library(CongoAS)

@@ -76,10 +76,11 @@ for (i in seq(1,nrow(files2download))){
 
   dest.file <- file.path("/data/gent/vo/000/gvo00074/felicien/CMIP6/historical/cVeg",basename(files2download$file_url[i]))
 
-  if (!file.exists(dest.file) | file.info(dest.file)[["size"]] == 0 |
-      download_size(files2download$file_url[i]) <  file.info(dest.file)[["size"]]){
+  if (!file.exists(dest.file) | file.info(dest.file)[["size"]] == 0){
 
-    dumb <- retry.func(download.file(url = files2download$file_url[i],
+    # download_size(files2download$file_url[i]) <  file.info(dest.file)[["size"]]
+
+    dumb <- retry.func(utils::download.file(url = files2download$file_url[i],
                                      destfile = dest.file),
                        maxErrors = 5,
                        sleep = 0)
@@ -92,8 +93,8 @@ for (i in seq(1,nrow(files2download))){
 ######################################################################################################################
 # Then download Precip
 
-prc <- init_cmip6_index(activity = "CMIP",
-                        variable = 'prc',
+pr <- init_cmip6_index(activity = "CMIP",
+                        variable = 'pr',
                         frequency = 'mon',
                         experiment = c("historical"),
                         source = NULL,
@@ -104,25 +105,69 @@ prc <- init_cmip6_index(activity = "CMIP",
                         limit = 10000L,
                         data_node = NULL)
 
-files2download.prc <- prc %>% filter(source_id %in% models,
+files2download.prc <- pr %>% filter(source_id %in% models,
                                      member_id == "r1i1p1f1",
                                      data_node %in% (data.nodes.status %>% filter(status == "UP") %>% pull(data_node)))
 
-print("--- Downloading prc files")
+print("--- Downloading pr files")
 
-for (i in seq(1,nrow(files2download))){
+for (i in seq(1,nrow(files2download.prc))){
 
-  dest.file <- file.path("/data/gent/vo/000/gvo00074/felicien/CMIP6/historical/prc",basename(files2download.prc$file_url[i]))
+  dest.file <- file.path("/data/gent/vo/000/gvo00074/felicien/CMIP6/historical/pr",basename(files2download.prc$file_url[i]))
 
   if (!file.exists(dest.file) | file.info(dest.file)[["size"]] == 0){
 
-    dumb <- retry.func(download.file(url = files2download.prc$file_url[i],
+    dumb <- retry.func(utils::download.file(url = files2download.prc$file_url[i],
                                      destfile = dest.file),
                maxErrors = 5,
                sleep = 0)
 
   }
 }
+
+
+###################################################################################################
+
+
+vegFrac <- init_cmip6_index(activity = "CMIP",
+                            variable = 'vegFrac',
+                            frequency = 'mon',
+                            experiment = c("historical"),
+                            source = NULL,
+                            variant = NULL,
+                            replica = FALSE,
+                            latest = TRUE,
+                            resolution = NULL,
+                            limit = 10000L,
+                            data_node = NULL)
+
+files2download.vegFrac <- vegFrac %>% filter(source_id %in% models,
+                                             member_id == "r1i1p1f1",
+                                             data_node %in% (data.nodes.status %>% filter(status == "UP") %>% pull(data_node)))
+
+print("--- Downloading vegFrac files")
+
+# Only download 1
+csetofmodels <- unique(files2download.vegFrac$source_id)
+
+for (i in seq(1,length(csetofmodels))){
+
+  crows <- files2download.vegFrac %>% filter(source_id == csetofmodels[i])
+  dest.file <- file.path("/data/gent/vo/000/gvo00074/felicien/CMIP6/historical/vegFrac",
+                         basename(crows$file_url[1]))
+
+  if (!file.exists(dest.file) | file.info(dest.file)[["size"]] == 0){
+
+    dumb <- retry.func(utils::download.file(url = crows$file_url[1],
+                                            destfile = dest.file),
+                       maxErrors = 5,
+                       sleep = 0)
+
+  }
+}
+
+
+
 
 
 # unique(test$source_id)

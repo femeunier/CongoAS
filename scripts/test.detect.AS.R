@@ -13,6 +13,10 @@ library(CongoAS)
 library(RCMIP5)
 library(zoo)
 library(viridis)
+library(stringr)
+library(ncdf4)
+library(ncdf4.helpers)
+library(lubridate)
 
 sf_use_s2(FALSE)
 
@@ -61,8 +65,8 @@ continent = "Tropics" # Africa or America or Tropics
 # ncfiles <- c("/home/femeunier/Downloads/cVeg_Lmon_TaiESM1_1pctCO2_r1i1p1f1_gn_000102-015012.nc")
 # ncfiles.cfile <- c("/home/femeunier/Downloads/cVeg_Lmon_TaiESM1_piControl_r1i1p1f1_gn_060101-070012.nc")
 
-ncfiles <- c("/home/femeunier/Downloads/cVeg_Lmon_IPSL-CM6A-LR_1pctCO2_r1i1p1f1_gr_185001-199912.nc")
-ncfiles.cfile <- c("/home/femeunier/Downloads/cVeg_Lmon_IPSL-CM6A-LR_piControl_r1i1p1f1_gr_355001-384912.nc")
+ncfiles <- c("/home/femeunier/Downloads/cVeg_Lmon_TaiESM1_1pctCO2_r1i1p1f1_gn_000102-015012.nc")
+ncfiles.cfile <- c("/home/femeunier/Downloads/cVeg_Lmon_TaiESM1_piControl_r1i1p1f1_gn_060101-070012.nc")
 
 world <- ne_countries(scale = "medium", returnclass = "sf")
 
@@ -98,7 +102,7 @@ ggplot(data = world) +
   labs(x = "",y = "") +
   theme_bw()
 
-ggplot(mapping = aes(x = yr,y = cVeg,group = interaction(lat,lon))) +
+ggplot(mapping = aes(x = year,y = cVeg,group = interaction(lat,lon))) +
   geom_line(data = model.OP[["TS.AS"]],
             size = 0.1, color = "darkgrey")+
   geom_line(data = model.OP[["TS.AS"]] %>% filter(AS),
@@ -140,25 +144,25 @@ ggplot(data = world) +
 cumAS <- model.OP[["TS.AS"]] %>%
   filter.continent(continent = "Tropics") %>%
   group_by(lat, lon, continent) %>%
-  mutate(CO2 = yr2CO2(yr)) %>%
+  mutate(CO2 = yr2CO2(year)) %>%
   mutate(cumAS = cummax(all.crit)) %>%
-  group_by(yr,continent) %>%
+  group_by(year,continent) %>%
   summarise(frac.AS = sum(cumAS)/length(AS),
             total.cVeg = sum(cVeg,na.rm = TRUE),
             CO2 = mean(CO2),
             .groups = "keep")
 
 ggplot(data = cumAS) +
-  geom_line(aes(x = yr, y = frac.AS, color = continent)) +
+  geom_line(aes(x = year, y = frac.AS, color = continent)) +
   theme_bw()
 
 df.control <- read.and.filter.ncfile(ncfiles.cfile,
-                                     continent2coord("World")[[1]],
+                                     continent2coord("World"),
                                      var = "cVeg",
-                                     aggr = TRUE,
-                                     yr.rel = 1:2)
+                                     aggr = TRUE)
 
-coord <- df.control %>% filter(yr == 0) %>%
+coord <- df.control %>%
+  filter(year == year[1]) %>%
   dplyr::select(lat,lon) %>%
   ungroup() %>%
   distinct()
@@ -182,7 +186,7 @@ Veg.dyn <- model.OP[["TS.AS"]]  %>%
   mutate(tot.cVeg = cVeg*area)
 
 ggplot(data = world) +
-  geom_tile(data = Veg.dyn %>% filter(yr == 0),
+  geom_tile(data = Veg.dyn %>% filter(year == 1),
             aes(x = lon, y = lat,fill = area),
             na.rm = TRUE, alpha = 0.8, color = NA) +
   geom_sf(fill = NA, color = "black") +
@@ -197,49 +201,49 @@ ggplot(data = world) +
 
 ggplot(data =  Veg.dyn %>%
          mutate(cont = coord2continent(lon)) %>%
-         group_by(yr,cont) %>%
+         group_by(year,cont) %>%
          summarise(tot.cVeg = sum(tot.cVeg,na.rm = TRUE)/1e12,
                    .groups = "keep") %>%
          group_by(cont) %>%
-         mutate(tot.Veg.rol.anomaly = compute.rolling.means(tot.cVeg,yr,Nyears = 10))
+         mutate(tot.Veg.rol.anomaly = compute.rolling.means(tot.cVeg,year,Nyears = 10))
        ) +
-  geom_line(aes(x = yr, y = tot.Veg.rol.anomaly, color = cont)) +
+  geom_line(aes(x = year, y = tot.Veg.rol.anomaly, color = cont)) +
   theme_bw()
 
 ###########################################################################################################
 # vs Global warming
 
-Temp.file <- c("/home/femeunier/Documents/projects/CongoAS/data/ts_Amon_IPSL-CM6A-LR_1pctCO2_r1i1p1f1_gr_185001-199912.nc")
+Temp.file <- c("/home/femeunier/Documents/projects/CongoAS/outputs/tas_Amon_TaiESM1_1pctCO2_r1i1p1f1_gn_000101-015012.nc")
 
 Tmp <- read.and.filter.ncfiles(ncfiles = Temp.file,
                                coord.analysis = continent2coord("World"),
-                               var = "ts",
+                               var = "tas",
                                aggr = TRUE,
                                progressbar = TRUE) %>%
 
-  mutate(tas = ts -273.15) %>%
+  mutate(tas = tas -273.15) %>%
   group_by(lat, lon) %>%
   mutate(ID = cur_group_id())
 
 Tmp.init <- Tmp %>%
   group_by(lat,lon) %>%
-  mutate(tas.mov = compute.rolling.means(tas,yr,Nyears = 10))
+  mutate(tas.mov = compute.rolling.means(tas,year,Nyears = 10))
 
-ggplot(data = Tmp.init %>% group_by(yr) %>%
+ggplot(data = Tmp.init %>% group_by(year) %>%
          summarise(tas.mov.m  = mean(tas.mov),
                    tas.mov.sd = sd(tas.mov))) +
-  geom_line(aes(x = yr, y = tas.mov.m)) +
-  geom_ribbon(aes(x = yr, y = tas.mov.m,
+  geom_line(aes(x = year, y = tas.mov.m)) +
+  geom_ribbon(aes(x = year, y = tas.mov.m,
                   ymin = tas.mov.m - tas.mov.sd, ymax = tas.mov.m + tas.mov.sd),
               alpha = 0.1) +
   theme_bw()
 
 Tmp.diff <- Tmp.init %>%
-  mutate(yr = round(yr)) %>%
-  filter(yr %in% c(5,140)) %>%
-  mutate(timing = case_when(yr == 5 ~ "Init",
+  mutate(year = round(year)) %>%
+  filter(year %in% c(5,140)) %>%
+  mutate(timing = case_when(year == 5 ~ "Init",
                             TRUE ~ "End")) %>%
-  dplyr::select(-yr) %>%
+  dplyr::select(-year) %>%
   group_by(lat,lon,timing) %>%
   summarise(tas = mean(tas.mov),
             .groups = "keep") %>%
@@ -266,16 +270,16 @@ Tmp.GW <- Tmp.init %>%
          lat = round(100*lat)/100) %>%
   left_join(Gridarea %>% rename(area = value),
             by = c("lat","lon")) %>%
-  group_by(yr) %>%
+  group_by(year) %>%
   summarise(tas = sum(tas*area,na.rm = TRUE)/sum(area),
             .groups = "keep") %>%
   ungroup() %>%
-  mutate(tas.anomaly = compute.rolling.means(tas,yr,Nyears = 10))
+  mutate(tas.anomaly = compute.rolling.means(tas,year,Nyears = 10))
 
-plot(Tmp.GW$yr,Tmp.GW$tas.anomaly,type = "l")
+plot(Tmp.GW$year,Tmp.GW$tas.anomaly,type = "l")
 
 cumAS.GW <- cumAS %>% left_join(Tmp.GW,
-                                by = "yr")
+                                by = "year")
 
 ggplot(data = cumAS.GW) +
   geom_line(aes(x = tas.anomaly, y = 100*frac.AS, color = continent)) +

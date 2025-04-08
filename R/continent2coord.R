@@ -11,6 +11,18 @@ continent2coord <- function(continent){
     min.lat.plot <- min.lat.analysis
     max.lat.plot <- max.lat.analysis
 
+  } else if (continent == "Temperate"){
+
+    min.lon.analysis <- -180
+    max.lon.analysis <- 180
+    min.lat.analysis <- 20
+    max.lat.analysis <- 70
+
+    min.lon.plot <- min.lon.analysis
+    max.lon.plot <- max.lon.analysis
+    min.lat.plot <- min.lat.analysis
+    max.lat.plot <- max.lat.analysis
+
   } else if (continent == "Africa"){
     min.lon.analysis <- -10
     max.lon.analysis <- 45
@@ -34,8 +46,8 @@ continent2coord <- function(continent){
     max.lat.plot <- max.lat.analysis
 
   } else if (continent == "Tropics"){
-    min.lon.analysis <- -90
-    max.lon.analysis <- 150
+    min.lon.analysis <- -180
+    max.lon.analysis <- 180
     min.lat.analysis <- -23
     max.lat.analysis <- 23
 

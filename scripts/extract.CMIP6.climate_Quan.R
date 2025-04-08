@@ -28,7 +28,8 @@ for (scenario in scenarios){
     all.files <- bind_rows(list(all.files,
                                 cfiles))
 
-    cdf <- cfiles %>% dplyr::select(var,model,scenario) %>%
+    cdf <- cfiles %>%
+      dplyr::select(var,model,scenario) %>%
       distinct()
 
     all.df <- bind_rows(list(all.df,
@@ -56,29 +57,31 @@ models.scenarios <- models2analyze %>%
 
 models.scenarios.2anal <- models.scenarios %>%
   mutate(all.scenarios = historical & ssp126 & ssp245 & ssp370 & ssp585) #%>%
-  # dplyr::filter(all.scenarios)
+# dplyr::filter(all.scenarios)
 
-models <- unique(models.scenarios.2anal[["model"]])
+models <- rev(unique(models.scenarios.2anal[["model"]]))
 
 overwrite = FALSE
 
 for (cmodel in models){
 
-  df.OP <- data.frame()
-
   print(cmodel)
 
-  OP.file <- file.path("./outputs/",paste0("df.",cmodel,".timeseries.RDS"))
 
-  if (file.exists(OP.file) & !overwrite) next()
+  for (cscenario in scenarios){
 
-  for (cvar in vars){
+    print(paste0("- ",cscenario))
 
-    print(paste0("- ",cvar))
+    OP.file <- file.path("./outputs/",paste0("Times.series.",cmodel,
+                                             ".",cscenario,".RDS"))
 
-    for (cscenario in scenarios){
+    df.OP <- data.frame()
 
-      print(paste0("-- ",cscenario))
+    if (file.exists(OP.file) & !overwrite) next()
+
+    for (cvar in vars){
+
+      print(paste0("-- ",cvar))
 
       csef.of.files <- all.files %>%
         dplyr::filter(model == cmodel,
@@ -92,12 +95,13 @@ for (cmodel in models){
 
       if (all(file.exists(files2read))){
         tmp <- tryCatch(read.and.filter.ncfiles(ncfiles = files2read,
-                                       coord.analysis = continent2coord("World"),
-                                       var = cvar,
-                                       aggr = FALSE) %>%
-          ungroup() %>%
-          distinct(),
-          error = function(err){NULL})
+                                                coord.analysis = continent2coord("World"),
+                                                var = cvar,
+                                                years = 1985:2100,
+                                                aggr = FALSE) %>%
+                          ungroup() %>%
+                          distinct(),
+                        error = function(err){NULL})
 
         if (is.null(tmp)) next()
 
@@ -109,38 +113,39 @@ for (cmodel in models){
         #   mutate(timing = case_when(yr %in% c(min(yr):(min(yr)+29)) ~ "beginning",
         #                             TRUE ~ "end"))
 
-        if (nrow(tmp %>%
-                 group_by(lat,lon,year) %>%
-                 summarise(N = length(year),
-                           .groups = "keep") %>%
-                 dplyr::filter(N !=12)) > 0){
-          warning(paste("Wrong month numbers:", files2read))
-          next()
-        }
+        # if (nrow(tmp %>%
+        #          group_by(lat,lon,year) %>%
+        #          summarise(N = length(year),
+        #                    .groups = "keep") %>%
+        #          dplyr::filter(N !=12)) > 0){
+        #   warning(paste("Wrong month numbers:", files2read))
+        #   next()
+        # }
 
         tmp <- tmp %>%
           rename(value := !!cvar) %>%
-          group_by(lat,lon,year) %>%
-          mutate(month = 1:12) %>%
+          # group_by(lat,lon,year) %>%
+          # mutate(month = 1:12) %>%
           group_by(lat,lon,month,year) %>%
-          summarise(value.m = mean(value),
+          summarise(value = mean(value,na.rm = TRUE),
                     .groups = "keep")
 
         df.OP <- bind_rows(df.OP,
                            tmp %>%
-          mutate(scenario = cscenario,
-                 var = cvar,
-                 model = cmodel))
+                             mutate(scenario = cscenario,
+                                    var = cvar,
+                                    model = cmodel))
 
       }
     }
+
+    if (nrow(df.OP) > 0){
+      saveRDS(df.OP,
+              OP.file)
+    }
   }
-
-  saveRDS(df.OP,
-          OP.file)
-
 }
 
-# scp /home/femeunier/Documents/projects/CongoAS/scripts/extract.CMIP6.climate.files_v2.R hpc:/kyukon/data/gent/vo/000/gvo00074/felicien/R
+# scp /home/femeunier/Documents/projects/CongoAS/scripts/extract.CMIP6.climate_Quan.R hpc:/kyukon/data/gent/vo/000/gvo00074/felicien/R
 
 

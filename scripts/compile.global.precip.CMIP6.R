@@ -1,6 +1,7 @@
 rm(list = ls())
 
 library(dplyr)
+library(CongoAS)
 
 system2("rsync",
         paste("-avz","hpc:/kyukon/data/gent/vo/000/gvo00074/felicien/R/outputs/global.precip.*",

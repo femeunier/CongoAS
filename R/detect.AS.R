@@ -112,7 +112,8 @@ detect.AS <- function(location = "Tropics",
         dplyr::select(lat,lon,year,cVeg.change) %>%
         rename(cVeg = cVeg.change) %>%
         mutate(timing = "Change")
-    )) %>% mutate(timing = factor(timing,levels = c("Init","Final","Change")))
+    )) %>%
+    mutate(timing = factor(timing,levels = c("Init","Final","Change")))
 
   basin.map <- basin.AS %>%
     group_by(lat,lon) %>%
